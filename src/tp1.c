@@ -110,42 +110,51 @@ size_t hospital_a_cada_pokemon(hospital_t *hospital,
 			       bool (*funcion)(pokemon_t *p, void *aux),
 			       void *aux)
 {
+	if (!hospital || !funcion) {
+		return 0;
+	}
 	size_t cant_veces_invocada = 0;
 	size_t i = 0;
 	while (i < hospital->cantidad_pokemon) {
-		if (funcion(hospital->pokemones[i], aux) == false)
+		if (funcion(hospital->pokemones[cant_veces_invocada], aux) ==
+		    false) {
+			cant_veces_invocada++;
 			return cant_veces_invocada;
+		}
 		cant_veces_invocada++;
 		i++;
 	}
-
 	return cant_veces_invocada;
-	// creo un contador para el limite de iteracion y uno para la cantidad de veces que se aplico la funcion, si la funcion es false con algun pokemon
-	// devuelvo el contador, sino sigo aumentando el contador de la funcion y el de la iteracion hasta que finalice y devuelvo el contador de la funcion nuevamente.
 }
 
 int hospital_aceptar_emergencias(hospital_t *hospital,
 				 pokemon_t **pokemones_ambulancia,
 				 size_t cant_pokes_ambulancia)
 {
+	if (!hospital || !pokemones_ambulancia)
+		return ERROR;
+	if (cant_pokes_ambulancia == 0) {
+		return EXITO;
+	}
 	hospital->pokemones =
 		realloc(hospital->pokemones,
-			sizeof(pokemones_ambulancia) *
-				cant_pokes_ambulancia); //esto es raro, fijarse
+			sizeof(pokemon_t *) * (cant_pokes_ambulancia +
+					       hospital->cantidad_pokemon));
 
-	if (hospital->pokemones == NULL)
-		return ERROR; // fallo realloc
-
-	for (size_t i = hospital->cantidad_pokemon;
-	     i < cant_pokes_ambulancia + hospital->cantidad_pokemon; i++) {
-		hospital->pokemones[i] =
-			pokemones_ambulancia[i - hospital->cantidad_pokemon];
-		// funcion itera desde la ultima posicion del vector de pokemones hasta la ultima nueva posicion posible, ej:
-		// si tengo 7 pokemones en hospital e ingresan 3 pokemones, i arranca en 7 y va hasta 10. y agrego en la posicion de i
-		// el pokemon en la posicion i-los pokemones que habia de los que hay en la ambulancia.
-		// quizas hay que ordenar los pokemones ingresados
+	if (hospital->pokemones == NULL) {
+		hospital_destruir(hospital);
+		return ERROR;
 	}
 
+	size_t j = 0;
+	for (size_t i = hospital->cantidad_pokemon;
+	     i < hospital->cantidad_pokemon + cant_pokes_ambulancia; i++) {
+		hospital->pokemones[i] = pokemones_ambulancia[j];
+		j++;
+		hospital->cantidad_entrenadores++;
+	}
+	hospital->cantidad_pokemon += cant_pokes_ambulancia;
+	ordenar_pokemones_por_salud(hospital);
 	return EXITO;
 }
 
@@ -153,8 +162,6 @@ pokemon_t *hospital_obtener_pokemon(hospital_t *hospital, size_t prioridad)
 {
 	if (!hospital->pokemones[prioridad])
 		return NULL;
-	printf("El pokemon es: %s ",
-	       pokemon_nombre(hospital->pokemones[prioridad]));
 	return hospital->pokemones[prioridad];
 }
 
@@ -164,5 +171,5 @@ void hospital_destruir(hospital_t *hospital)
 		free(hospital->pokemones[i]);
 	}
 	free(hospital->pokemones);
-	free(hospital); // liberar cada pokemon, luego el vector de pokemones y luego el hospital?
+	free(hospital);
 }

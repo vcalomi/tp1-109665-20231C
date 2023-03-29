@@ -41,6 +41,8 @@ pokemon_t *pokemon_crear_desde_string(const char *string)
 			p->salud = (size_t)atoi(campo);
 			break;
 		case 4:
+			if (campo[strlen(campo) - 1] == '\n')
+				campo[strlen(campo) - 1] = '\0';
 			strcpy(p->nombre_entrenador, campo);
 			break;
 		default:
@@ -60,48 +62,35 @@ pokemon_t *pokemon_crear_desde_string(const char *string)
 
 pokemon_t *pokemon_copiar(pokemon_t *poke)
 {
-	if (poke == NULL) // chequeo que el puntero recibido no sea null
+	if (poke == NULL)
 		return NULL;
 
-	pokemon_t *copia_poke = malloc(sizeof(
-		pokemon_t)); // reservo memoria para la copia y me fijo que no haya fallado
+	pokemon_t *copia_poke = malloc(sizeof(pokemon_t));
 	if (copia_poke == NULL)
 		return NULL;
 
 	memcpy(copia_poke, poke, sizeof(pokemon_t));
 
-	// guardo el pokemon en la copia, quizas hay que usar la otra funcion (mcmcpy algo asi)
-	return copia_poke; // devuelvo la copia
+	return copia_poke;
 }
 
 bool pokemon_son_iguales(pokemon_t *pokemon1, pokemon_t *pokemon2)
 {
 	if (pokemon1 == NULL || pokemon2 == NULL)
 		return NULL;
-
-	printf("Id: %d ", pokemon1->id == pokemon2->id);
-	printf("Salud: %d ", pokemon1->salud == pokemon2->salud);
-	printf("Nombre: %d ", strcmp(pokemon1->nombre, pokemon2->nombre));
-
-	printf("%s,%s", pokemon1->nombre_entrenador,
-	       pokemon2->nombre_entrenador);
-
-	printf("Nombre entrenador: %d ", strcmp(pokemon1->nombre_entrenador,
-						pokemon2->nombre_entrenador));
 	if (strcmp(pokemon1->nombre, pokemon2->nombre) == 0 &&
 	    strcmp(pokemon1->nombre_entrenador, pokemon2->nombre_entrenador) ==
 		    0 &&
 	    pokemon1->id == pokemon2->id && pokemon1->salud == pokemon2->salud)
 		return true;
-	return false; // quizas hay que chequear la salud y los entrenadores tambien
+	return false;
 }
 
 char *pokemon_nombre(pokemon_t *pokemon)
 {
 	if (pokemon == NULL)
 		return NULL;
-	return pokemon
-		->nombre; // si el puntero recibido es valido devuelvo el nombre
+	return pokemon->nombre;
 }
 
 char *pokemon_entrenador(pokemon_t *pokemon)
