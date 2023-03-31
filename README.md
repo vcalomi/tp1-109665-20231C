@@ -4,57 +4,59 @@
 
 # TP1
 
-## Repositorio de (Nombre Apellido) - (Padrón) - (Mail)
+## Repositorio de Valentin Calomin0 - 109665 - vcalomino@fi.uba.ar
 
 - Para compilar:
 
 ```bash
-línea de compilación
+gcc src/*.c pruebas_chanutron.c -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O2 -g -o pruebas_chanutron
 ```
 
 - Para ejecutar:
 
 ```bash
-línea de ejecución
+./pruebas_chanutron
 ```
 
 - Para ejecutar con valgrind:
 ```bash
-línea con valgrind
+valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes ./pruebas_chanutron
 ```
 ---
 ##  Funcionamiento
 
-Explicación de cómo funcionan las estructuras desarrolladas en el TP y el funcionamiento general del mismo.
+El programa cuenta con dos estructuras principales: hospital_t y pokemon_t.
 
-Aclarar en esta parte todas las decisiones que se tomaron al realizar el TP, cosas que no se aclaren en el enunciado, fragmentos de código que necesiten explicación extra, etc.
+<img width="70%" src="img/Estructuras.svg">
 
-Incluír **EN TODOS LOS TPS** los diagramas relevantes al problema (mayormente diagramas de memoria para explicar las estructuras, pero se pueden utilizar otros diagramas si es necesario).
+Para crear estas estructuras se lee un archivo linea por linea que cuenta con un formato especifico (id,nombre,salud,entrenador) y se crea un pokemon que se agrega al hospital.
 
-### Por ejemplo:
+<img width="70%" src="img/Creacion hospital.svg">
 
-El programa funciona abriendo el archivo pasado como parámetro y leyendolo línea por línea. Por cada línea crea un registro e intenta agregarlo al vector. La función de lectura intenta leer todo el archivo o hasta encontrar el primer error. Devuelve un vector con todos los registros creados.
-
-<div align="center">
-<img width="70%" src="img/diagrama1.svg">
-</div>
-
-En el archivo `sarasa.c` la función `funcion1` utiliza `realloc` para agrandar la zona de memoria utilizada para conquistar el mundo. El resultado de `realloc` lo guardo en una variable auxiliar para no perder el puntero original en caso de error:
+Como utilice la funcion "fgets", para validar que el archivo no este vacio, primero chequeo que lo que devuelve no sea null:
 
 ```c
-int *vector = realloc(vector_original, (n+1)*sizeof(int));
+if (fgets(linea, LONGITUD_LINEA, f) == NULL) {
+		free(hospital);
+		fclose(f);
+		return NULL;
+	}
+```
+y lo utilizo para crear un pokemon y luego, una vez que se que el archivo no esta vacio, utilizo fgets en un while:
 
-if(vector == NULL)
-    return -1;
-vector_original = vector;
+```c
+while (fgets(linea, LONGITUD_LINEA, f))
 ```
 
+Para realizar el realloc mencionado en el diagrama se utiliza:
 
-<div align="center">
-<img width="70%" src="img/diagrama2.svg">
-</div>
+```c
+hospital->pokemones = realloc(hospital->pokemones, sizeof(pokemon_t *) * (hospital->cantidad_pokemon + 1));
+```
+
+(Aclaracion: a la hora de crear el hospital cada linea se guarda en una variable "char linea[LONGITUD_LINEA];" siendo esta longitud la maxima sugerida por el enunciado.)
+(Aclaracion 2: la variable size_t cantidad_entrenadores que se encuentra en hospital_t la implemente asumiendo que con cada pokemon se agrega un entrenador, de igual manera no influia en el desarrollo de las pruebas.)
+
+Tambien, implemente una funcion que compara la salud de un pokemon con el siguiente en el vector y si el orden es incorrecto los intercambia. Esto termina con un vector de pokemones ordenados por salud siendo el de la posicion "0" el de menor salud.
 
 ---
-
-## Respuestas a las preguntas teóricas
-Incluír acá las respuestas a las preguntas del enunciado (si aplica).
