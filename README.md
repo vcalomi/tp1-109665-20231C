@@ -53,6 +53,8 @@ Para realizar el realloc mencionado en el diagrama se utiliza:
 ```c
 hospital->pokemones = realloc(hospital->pokemones, sizeof(pokemon_t *) * (hospital->cantidad_pokemon + 1));
 ```
+<img width="70%" src="img/Realloc.svg">
+(En la imagen se muestra la memoria vieja a modo de representacion, ya que si el realloc es exitoso la memoria anterior se libera.)
 
 (Aclaracion: a la hora de crear el hospital cada linea se guarda en una variable "char linea[LONGITUD_LINEA];" siendo esta longitud la maxima sugerida por el enunciado.)
 (Aclaracion 2: la variable size_t cantidad_entrenadores que se encuentra en hospital_t la implemente asumiendo que con cada pokemon se agrega un entrenador, de igual manera no influia en el desarrollo de las pruebas.)
